@@ -1,0 +1,28 @@
+# Secrets / machine state – never track
+.claude.json
+.claude/.credentials.json
+.ssh/
+.gnupg/
+**/id_*
+*.pem
+*.key
+
+# Wi-Fi / NetworkManager
+system-connections/
+*.nmconnection
+
+# Game prefixes and launchers' data
+.steam/
+.local/share/Steam/
+.local/share/lutris/
+.config/lutris/runners/
+.wine/
+**/pfx/
+**/compatdata/
+**/steamapps/
+**/Proton*/
+**/GE-Proton*/
+
+# Misc
+*.swp
+*~

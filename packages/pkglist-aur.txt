@@ -1,0 +1,5 @@
+claude-desktop-extra
+helium-browser-bin
+protonup-qt
+yay
+yay-debug
