@@ -1,0 +1,12 @@
+[General]
+ocrLanguages=afr
+
+[ImageSave]
+translatedScreenshotsFolder=Screenshots
+
+[VideoSave]
+translatedScreencastsFolder=Screencasts
+
+[ViewerWindow]
+1920x1080 screen: Height=578
+1920x1080 screen: Width=822

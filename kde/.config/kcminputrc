@@ -1,0 +1,7 @@
+[Libinput][1133][16511][Logitech G502]
+NaturalScroll=false
+ScrollFactor=1
+
+[Libinput][1267][12887][ASUE120B:00 04F3:3257 Touchpad]
+NaturalScroll=true
+ScrollFactor=2
