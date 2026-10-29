@@ -8,6 +8,7 @@ dolphin
 efibootmgr
 gamemode
 git
+github-cli
 grub
 gst-plugin-pipewire
 htop
@@ -39,6 +40,7 @@ smartmontools
 sof-firmware
 sof-tools
 steam
+stow
 sudo
 ufw
 vim
@@ -52,4 +54,5 @@ xdg-utils
 xf86-video-amdgpu
 xf86-video-ati
 xf86-video-nouveau
+yt-dlp
 zram-generator
