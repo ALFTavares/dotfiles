@@ -10,7 +10,7 @@ Personal dotfiles for an Arch Linux + KDE Plasma machine. There is no build, lin
 
 Each top-level directory is a "package" whose internal path mirrors `$HOME`. For example, `bash/.bashrc` maps to `~/.bashrc`, and `kde/.config/kwinrc` maps to `~/.config/kwinrc`. The home directory holds symlinks back into this repo (e.g. `~/.bashrc -> dotfiles/bash/.bashrc`), so editing a file here edits the live config. No stow script or install script is committed. Keep new files in the same `<package>/<path-relative-to-home>` shape.
 
-Packages: `bash`, `claude` (`~/.claude/settings.json`), `gtk`, `kde` (Plasma, KWin, Dolphin, shortcuts, etc.), `konsole` (Flatpak path under `.var/app/`), `lutris`, `npm`, `pupgui`.
+Packages: `bash`, `claude` (`~/.claude/settings.json`), `gtk`, `kde` (Plasma, KWin, Dolphin, shortcuts, etc.), `konsole` (Flatpak path under `.var/app/`), `lutris`, `npm`, `nvim` (`~/.config/nvim`; a git submodule pointing to the separate `ALFTavares/nvim` repo on its `main` branch, so commit nvim changes there and then bump the submodule pointer here), `pupgui`.
 
 `packages/` holds package inventories for rebuilding the system:
 - `pkglist-native.txt`: native pacman packages
