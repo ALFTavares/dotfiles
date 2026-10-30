@@ -1,3 +1,7 @@
+[General]
+FreeFloating=true
+historyBehavior=Disabled
+
 [Plugins]
 baloosearchEnabled=false
 browserhistoryEnabled=false
