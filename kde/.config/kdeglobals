@@ -158,6 +158,11 @@ Sort reversed=false
 Speedbar Width=140
 View Style=DetailTree
 
+[Shortcuts]
+AddBookmark=
+SubstringCompletion=
+TextCompletion=
+
 [WM]
 activeBackground=39,44,49
 activeBlend=252,252,252

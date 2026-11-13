@@ -1,10 +1,13 @@
 amd-ucode
+aspnet-runtime
 base
 base-devel
 bluez
 bluez-utils
 btrfs-progs
 dolphin
+dotnet-runtime
+dotnet-sdk
 efibootmgr
 gamemode
 git
@@ -14,6 +17,7 @@ gst-plugin-pipewire
 htop
 intel-media-driver
 iwd
+kwalletmanager
 lib32-gamemode
 lib32-mangohud
 libpulse
@@ -23,6 +27,7 @@ linux
 linux-firmware
 lutris
 mangohud
+marksman
 mkinitcpio
 nano
 neovim

@@ -12,6 +12,10 @@ NightTemperature=5500
 padding=4
 tiles={"layoutDirection":"horizontal","tiles":[{"width":0.25},{"width":0.5},{"width":0.25}]}
 
+[Tiling][d846e197-c63a-4b65-a50b-1072b024820d][21b7fc7d-6a8a-4b9a-9175-6a242b4c5d08]
+padding=4
+tiles={"layoutDirection":"horizontal","tiles":[{"width":0.25},{"width":0.5},{"width":0.25}]}
+
 [Tiling][d846e197-c63a-4b65-a50b-1072b024820d][410c8cf5-e73e-43b7-8905-6acb63406b7f]
 padding=4
 tiles={"layoutDirection":"horizontal","tiles":[{"width":0.25},{"width":0.5},{"width":0.25}]}
