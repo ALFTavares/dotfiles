@@ -16,6 +16,7 @@ grub
 gst-plugin-pipewire
 htop
 intel-media-driver
+iw
 iwd
 kwalletmanager
 lib32-gamemode
