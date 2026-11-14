@@ -46,6 +46,7 @@ Each file in these folders is linked into your home folder at the same path. For
 | `bash` | `~/.bashrc`, `~/.bash_profile` |
 | `claude` | Claude Code settings (`~/.claude/settings.json`) and global instructions (`~/.claude/CLAUDE.md`) |
 | `gtk` | GTK 2/3/4 theme settings, so GTK apps match Plasma |
+| `helium` | Helium browser startup flags (`~/.config/helium-browser-flags.conf`): open the main profile without the profile picker and restore the last session |
 | `kde` | Plasma, KWin, window rules, shortcuts, KRunner, Dolphin, power management, screen locker, KWallet, default apps |
 | `konsole` | Konsole profile and settings (Flatpak version) |
 | `lutris` | Lutris settings |
