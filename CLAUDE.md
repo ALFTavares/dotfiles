@@ -12,7 +12,7 @@ Each top-level directory is a "package" whose internal path mirrors `$HOME`. For
 
 Packages: `bash`, `claude` (`~/.claude/settings.json`), `gtk`, `kde` (Plasma, KWin, Dolphin, shortcuts, etc.), `konsole` (Flatpak path under `.var/app/`), `lutris`, `npm`, `nvim` (`~/.config/nvim`; a git submodule pointing to the separate `ALFTavares/nvim` repo on its `main` branch, so commit nvim changes there and then bump the submodule pointer here), `pupgui`.
 
-The exception is `system/`, which mirrors `/` instead of `$HOME` (e.g. `system/etc/iwd/main.conf` maps to `/etc/iwd/main.conf`). These files are symlinked into place as root, e.g. `sudo ln -s ~/dotfiles/system/etc/iwd/main.conf /etc/iwd/main.conf`. It currently holds the WiFi fixes for the MT7902 card: iwd power save off, and PCIe ASPM off via a modprobe option.
+The exception is `system/`, which mirrors `/` instead of `$HOME` (e.g. `system/etc/iwd/main.conf` maps to `/etc/iwd/main.conf`). These files are symlinked into place as root, e.g. `sudo ln -s ~/dotfiles/system/etc/iwd/main.conf /etc/iwd/main.conf`. Files read early in boot, before `/home` is mounted (such as `etc/modprobe.d/`), must be copied with `sudo cp` instead of symlinked, so after editing them here, copy them again. It currently holds the WiFi fixes for the MT7902 card: iwd power save off, and PCIe ASPM off via a modprobe option.
 
 `packages/` holds package inventories for rebuilding the system:
 - `pkglist-native.txt`: native pacman packages
