@@ -14,10 +14,12 @@ git
 github-cli
 grub
 gst-plugin-pipewire
+gst-plugins-base
 htop
 intel-media-driver
 iw
 iwd
+kamoso
 kwalletmanager
 lib32-gamemode
 lib32-mangohud
