@@ -66,6 +66,17 @@ run() {
     if (( ! DRY_RUN )); then "$@"; fi
 }
 
+# root_check <command...>: a read-only check that needs root, such as testing
+# a path we can't read. A dry run uses sudo -n, so it never asks for a
+# password; if sudo isn't available the check just counts as false.
+root_check() {
+    if (( DRY_RUN )); then
+        sudo -n "$@" 2>/dev/null
+    else
+        sudo "$@"
+    fi
+}
+
 same_file() {
     [[ -e "$1" && -e "$2" && "$(readlink -f "$1")" == "$(readlink -f "$2")" ]]
 }
@@ -95,21 +106,22 @@ install_system() {
             return
         fi
         # sudo, because the target's directory may not be readable by us.
-        if sudo test -f "$target" -a ! -L "$target" && sudo cmp -s "$src" "$target"; then
+        if root_check test -f "$target" -a ! -L "$target" && root_check cmp -s "$src" "$target"; then
             return
         fi
     elif same_file "$src" "$target"; then
         return
     fi
-    if [[ -e "$target" || -L "$target" ]] || { [[ -n "$owner" ]] && sudo test -e "$target"; }; then
+    if [[ -e "$target" || -L "$target" ]] || { [[ -n "$owner" ]] && root_check test -e "$target"; }; then
         note "backing up $target to $target.bak-$STAMP"
         run sudo mv "$target" "$target.bak-$STAMP"
     fi
     if [[ -n "$owner" ]]; then
         # Missing parent directories are created owned by $owner, e.g.
         # /var/lib/plasmalogin/.config. Ones that already exist are untouched.
+        # Stops at /, so a failed check can't loop forever.
         local dir="$(dirname "$target")" missing=()
-        while ! sudo test -d "$dir"; do
+        while [[ "$dir" != / ]] && ! root_check test -d "$dir"; do
             missing=("$dir" "${missing[@]}")
             dir="$(dirname "$dir")"
         done
@@ -145,6 +157,19 @@ elif (( ! ASSUME_YES )); then
     [[ "$answer" == [yY]* ]] || exit 1
 fi
 
+# Get sudo working once up front, so a failed or cancelled password prompt
+# stops the script here instead of making later checks quietly fail.
+if (( DRY_RUN )); then
+    if ! sudo -n true 2>/dev/null; then
+        note "sudo needs a password, so checks of root-only paths are skipped"
+        note "and those files are shown as if they need installing."
+        note "Run 'sudo -v' first to include them."
+    fi
+elif ! sudo -v; then
+    echo "sudo failed; nothing was changed." >&2
+    exit 1
+fi
+
 bold "Fetching the nvim submodule"
 run git -C "$DOTFILES" submodule update --init --recursive
 
@@ -171,7 +196,7 @@ if (( ! SKIP_PACKAGES )); then
     # yay is handled above; -debug packages aren't in the AUR.
     mapfile -t aur < <(grep -v -e '^\s*$' -e '-debug$' -e '^yay$' "$DOTFILES/packages/pkglist-aur.txt")
     if (( ${#aur[@]} )); then
-        run yay -S --needed --noconfirm "${aur[@]}"
+        run yay -S --needed --noconfirm --sudoloop "${aur[@]}"
     fi
 
     bold "Installing Flatpak apps"
@@ -212,8 +237,8 @@ done < <(find "$DOTFILES/system" -type f -print0)
 # Rebuild the GRUB menu when /etc/default/grub is newer than it. -nt follows
 # the symlink, so editing system/etc/default/grub also triggers this.
 GRUB_CFG=/boot/grub/grub.cfg
-if command -v grub-mkconfig >/dev/null && sudo test -f "$GRUB_CFG" \
-        && sudo test /etc/default/grub -nt "$GRUB_CFG"; then
+if command -v grub-mkconfig >/dev/null && root_check test -f "$GRUB_CFG" \
+        && root_check test /etc/default/grub -nt "$GRUB_CFG"; then
     run sudo grub-mkconfig -o "$GRUB_CFG"
 fi
 
