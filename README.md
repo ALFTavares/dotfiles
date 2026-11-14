@@ -44,7 +44,7 @@ Each file in these folders is linked into your home folder at the same path. For
 | Folder | What it configures |
 | --- | --- |
 | `bash` | `~/.bashrc`, `~/.bash_profile` |
-| `claude` | Claude Code settings (`~/.claude/settings.json`) |
+| `claude` | Claude Code settings (`~/.claude/settings.json`) and global instructions (`~/.claude/CLAUDE.md`) |
 | `gtk` | GTK 2/3/4 theme settings, so GTK apps match Plasma |
 | `kde` | Plasma, KWin, window rules, shortcuts, KRunner, Dolphin, power management, screen locker, KWallet, default apps |
 | `konsole` | Konsole profile and settings (Flatpak version) |
