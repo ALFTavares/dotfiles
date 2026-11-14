@@ -58,6 +58,14 @@ copy_owner() {
 SERVICES=(NetworkManager iwd bluetooth power-profiles-daemon systemd-resolved ufw)
 DISPLAY_MANAGER=plasmalogin
 
+# Groups the user running this script is added to (the original machine's
+# memberships, minus the user's own primary group).
+#   wheel   sudo access. Normally set when the user is created, since this
+#           script already needs sudo to run; listed so the record is complete
+#   render  GPU compute and rendering (/dev/dri/renderD*)
+#   uucp    access to USB serial devices (/dev/ttyUSB*), e.g. the K+DCAN cable
+USER_GROUPS=(wheel render uucp)
+
 # ---------------------------------------------------------------------------
 
 bold() { printf '\n\033[1m==> %s\033[0m\n' "$*"; }
@@ -275,6 +283,15 @@ fi
 if [[ "$(readlink /etc/resolv.conf 2>/dev/null)" != /run/systemd/resolve/stub-resolv.conf ]]; then
     run sudo ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 fi
+
+bold "Adding $USER to groups"
+for group in "${USER_GROUPS[@]}"; do
+    if ! getent group "$group" >/dev/null; then
+        note "skipping $group (group doesn't exist)"
+    elif ! id -nG "$USER" | grep -qw "$group"; then
+        run sudo usermod -aG "$group" "$USER"
+    fi
+done
 
 bold "Done"
 if [[ -d "$HOME_BACKUP" ]]; then
