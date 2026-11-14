@@ -25,14 +25,78 @@ Config files and package lists for my Arch Linux + KDE Plasma machines.
 
 5. Reboot.
 
-## What `install.sh` does
+## What `install.sh` changes
 
-- **Packages:** installs `packages/pkglist-native.txt` with pacman, builds `yay` if it's missing, then installs `packages/pkglist-aur.txt` and the Flatpaks in `packages/flatpaks.txt`.
-- **Home configs:** links each package folder (`bash`, `kde`, `nvim`, ...) into your home folder. Any existing file it would replace is moved to `~/.dotfiles-backup/<date>/` first.
-- **System configs:** installs the files in `system/` into `/`. Hardware-specific files, such as the fixes for the MediaTek MT7902 WiFi card, are skipped when that hardware isn't present.
-- **Services:** enables NetworkManager (with iwd for WiFi), bluetooth, power-profiles-daemon, systemd-resolved, ufw and the Plasma login screen.
+The script works in five steps. It's safe to run again: anything already in place is left alone, and `--dry-run` prints every command without running it.
 
-It's safe to run again: anything already in place is left alone.
+### 1. Packages
+
+| Source | Installed with |
+| --- | --- |
+| `packages/pkglist-native.txt` | `pacman`, plus `flatpak`, `networkmanager` and `pciutils`, which the setup needs |
+| `packages/pkglist-aur.txt` | `yay`, which is built from the AUR first if it's missing. `-debug` packages are skipped. |
+| `packages/flatpaks.txt` | `flatpak`, system-wide, after adding the Flathub remote |
+
+### 2. Configs in your home folder
+
+Each file in these folders is linked into your home folder at the same path. For example, `kde/.config/kwinrc` becomes `~/.config/kwinrc`. Any file already there is moved to `~/.dotfiles-backup/<date>/` first.
+
+| Folder | What it configures |
+| --- | --- |
+| `bash` | `~/.bashrc`, `~/.bash_profile` |
+| `claude` | Claude Code settings (`~/.claude/settings.json`) |
+| `gtk` | GTK 2/3/4 theme settings, so GTK apps match Plasma |
+| `kde` | Plasma, KWin, window rules, shortcuts, KRunner, Dolphin, power management, screen locker, KWallet, default apps |
+| `konsole` | Konsole profile and settings (Flatpak version) |
+| `lutris` | Lutris settings |
+| `npm` | `~/.npmrc` |
+| `nvim` | Neovim config. The whole `~/.config/nvim` folder is one link to the [nvim repo](https://github.com/ALFTavares/nvim) submodule. |
+| `pupgui` | ProtonUp-Qt settings |
+
+### 3. System configs in `/etc`
+
+| File | Setting | Why | Installed when |
+| --- | --- | --- | --- |
+| `/etc/NetworkManager/conf.d/wifi_backend.conf` | `wifi.backend=iwd` | Use iwd instead of wpa_supplicant for WiFi | Always (linked) |
+| `/etc/iwd/main.conf` | `[DriverQuirks]`<br>`PowerSaveDisable=mt7921e` | Keep WiFi power saving off, since it can cause dropouts and lag | MT7902 card present (linked) |
+| `/etc/modprobe.d/mt7921e.conf` | `options mt7921e disable_aspm=1` | Turn off PCIe power saving (ASPM) on the WiFi card. The BIOS has no setting for this. | MT7902 card present (copied) |
+
+The MT7902 is the MediaTek WiFi card in the desktop (PCI ID `14c3:7902`, `mt7921e` driver). On other hardware these two files are skipped. Any existing file is renamed to `<file>.bak-<date>` before being replaced.
+
+### 4. Services
+
+| Service | Purpose |
+| --- | --- |
+| `NetworkManager` | Network connections |
+| `iwd` | WiFi, used by NetworkManager |
+| `bluetooth` | Bluetooth |
+| `power-profiles-daemon` | Power profiles in Plasma (performance, balanced, power saver) |
+| `systemd-resolved` | DNS |
+| `ufw` | Firewall |
+| `plasmalogin` | Plasma login screen. Only enabled if no other login screen is set up; otherwise the script prints how to switch. |
+
+The script also:
+
+- disables `wpa_supplicant` if it's enabled, because iwd replaces it
+- links `/etc/resolv.conf` to `/run/systemd/resolve/stub-resolv.conf`, so DNS goes through systemd-resolved
+
+Services are enabled but not started, so the network doesn't drop mid-install. They start on the next boot.
+
+### 5. Checking it worked
+
+After rebooting:
+
+```sh
+systemctl is-active NetworkManager iwd bluetooth   # all "active"
+readlink /etc/resolv.conf                          # /run/systemd/resolve/stub-resolv.conf
+```
+
+On a machine with the MT7902 card:
+
+```sh
+iw dev wlan0 get power_save                        # Power save: off
+cat /sys/module/mt7921e/parameters/disable_aspm    # Y
+```
 
 ### Options
 
