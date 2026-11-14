@@ -57,6 +57,7 @@ Each file in these folders is linked into your home folder at the same path. For
 
 | File | Setting | Why | Installed when |
 | --- | --- | --- | --- |
+| `/etc/default/grub` | `GRUB_TIMEOUT=1` | Show the boot menu for 1 second instead of 5. Otherwise Arch's default file. `/boot/grub/grub.cfg` is rebuilt with `grub-mkconfig` whenever this file is newer than it. | Always (linked) |
 | `/etc/NetworkManager/conf.d/wifi_backend.conf` | `wifi.backend=iwd` | Use iwd instead of wpa_supplicant for WiFi | Always (linked) |
 | `/etc/iwd/main.conf` | `[DriverQuirks]`<br>`PowerSaveDisable=mt7921e` | Keep WiFi power saving off, since it can cause dropouts and lag | MT7902 card present (linked) |
 | `/etc/modprobe.d/mt7921e.conf` | `options mt7921e disable_aspm=1` | Turn off PCIe power saving (ASPM) on the WiFi card. The BIOS has no setting for this. | MT7902 card present (copied) |

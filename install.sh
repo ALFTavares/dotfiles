@@ -209,6 +209,13 @@ while IFS= read -r -d '' src; do
     fi
     install_system "$src" "/$rel" "$rel"
 done < <(find "$DOTFILES/system" -type f -print0)
+# Rebuild the GRUB menu when /etc/default/grub is newer than it. -nt follows
+# the symlink, so editing system/etc/default/grub also triggers this.
+GRUB_CFG=/boot/grub/grub.cfg
+if command -v grub-mkconfig >/dev/null && sudo test -f "$GRUB_CFG" \
+        && sudo test /etc/default/grub -nt "$GRUB_CFG"; then
+    run sudo grub-mkconfig -o "$GRUB_CFG"
+fi
 
 bold "Enabling services"
 for svc in "${SERVICES[@]}"; do
