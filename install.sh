@@ -42,11 +42,13 @@ declare -A SYSTEM_REQUIRES_PCI=(
 # Files in system/ that are copied instead of symlinked, and the user that
 # owns the copy. Prints nothing (and fails) for files that are symlinked.
 #   etc/modprobe.d/       read early in boot, before /home is mounted
+#   etc/locale.conf       read early in boot, before /home is mounted
+#   etc/locale.gen        copied too, so its mtime says when to rerun locale-gen
 #   var/lib/plasmalogin/  login screen settings; the greeter runs as the
 #                         plasmalogin user, which can't read files in $HOME
 copy_owner() {
     case "$1" in
-        etc/modprobe.d/*) echo root ;;
+        etc/modprobe.d/*|etc/locale.conf|etc/locale.gen) echo root ;;
         var/lib/plasmalogin/*) echo plasmalogin ;;
         *) return 1 ;;
     esac
@@ -240,6 +242,12 @@ GRUB_CFG=/boot/grub/grub.cfg
 if command -v grub-mkconfig >/dev/null && root_check test -f "$GRUB_CFG" \
         && root_check test /etc/default/grub -nt "$GRUB_CFG"; then
     run sudo grub-mkconfig -o "$GRUB_CFG"
+fi
+# Build the locales in /etc/locale.gen when it's newer than the compiled
+# archive (installing the copy above updates its mtime), or there's no archive.
+LOCALE_ARCHIVE=/usr/lib/locale/locale-archive
+if [[ ! -f "$LOCALE_ARCHIVE" || /etc/locale.gen -nt "$LOCALE_ARCHIVE" ]]; then
+    run sudo locale-gen
 fi
 
 bold "Enabling services"

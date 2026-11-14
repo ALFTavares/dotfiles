@@ -1,0 +1,7 @@
+# Locales built by locale-gen. en_US for the language, en_GB for dates and
+# times (English month names, day/month/year), pt_PT for the other formats.
+# See locale.conf. The full list of available locales is in
+# /usr/share/i18n/SUPPORTED.
+en_US.UTF-8 UTF-8
+en_GB.UTF-8 UTF-8
+pt_PT.UTF-8 UTF-8
