@@ -39,11 +39,15 @@ declare -A SYSTEM_REQUIRES_PCI=(
     [etc/modprobe.d/mt7921e.conf]="14c3:7902"
 )
 
-# Files in system/ that are read early in boot, before /home is mounted.
-# These are copied instead of symlinked.
-is_early_boot() {
+# Files in system/ that are copied instead of symlinked, and the user that
+# owns the copy. Prints nothing (and fails) for files that are symlinked.
+#   etc/modprobe.d/       read early in boot, before /home is mounted
+#   var/lib/plasmalogin/  login screen settings; the greeter runs as the
+#                         plasmalogin user, which can't read files in $HOME
+copy_owner() {
     case "$1" in
-        etc/modprobe.d/*) return 0 ;;
+        etc/modprobe.d/*) echo root ;;
+        var/lib/plasmalogin/*) echo plasmalogin ;;
         *) return 1 ;;
     esac
 }
@@ -84,22 +88,37 @@ link_home() {
 
 # install_system <source in repo> <target under />
 install_system() {
-    local src="$1" target="$2" rel="$3"
-    if is_early_boot "$rel"; then
-        if [[ -f "$target" && ! -L "$target" ]] && cmp -s "$src" "$target"; then
+    local src="$1" target="$2" rel="$3" owner=""
+    if owner="$(copy_owner "$rel")"; then
+        if ! id "$owner" >/dev/null 2>&1; then
+            note "skipping $target (user $owner doesn't exist)"
+            return
+        fi
+        # sudo, because the target's directory may not be readable by us.
+        if sudo test -f "$target" -a ! -L "$target" && sudo cmp -s "$src" "$target"; then
             return
         fi
     elif same_file "$src" "$target"; then
         return
     fi
-    if [[ -e "$target" || -L "$target" ]]; then
+    if [[ -e "$target" || -L "$target" ]] || { [[ -n "$owner" ]] && sudo test -e "$target"; }; then
         note "backing up $target to $target.bak-$STAMP"
         run sudo mv "$target" "$target.bak-$STAMP"
     fi
-    run sudo mkdir -p "$(dirname "$target")"
-    if is_early_boot "$rel"; then
-        run sudo install -m 644 "$src" "$target"
+    if [[ -n "$owner" ]]; then
+        # Missing parent directories are created owned by $owner, e.g.
+        # /var/lib/plasmalogin/.config. Ones that already exist are untouched.
+        local dir="$(dirname "$target")" missing=()
+        while ! sudo test -d "$dir"; do
+            missing=("$dir" "${missing[@]}")
+            dir="$(dirname "$dir")"
+        done
+        for dir in "${missing[@]}"; do
+            run sudo install -d -o "$owner" -g "$owner" "$dir"
+        done
+        run sudo install -o "$owner" -g "$owner" -m 644 "$src" "$target"
     else
+        run sudo mkdir -p "$(dirname "$target")"
         run sudo ln -s "$src" "$target"
     fi
 }

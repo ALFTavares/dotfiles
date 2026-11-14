@@ -53,13 +53,14 @@ Each file in these folders is linked into your home folder at the same path. For
 | `nvim` | Neovim config. The whole `~/.config/nvim` folder is one link to the [nvim repo](https://github.com/ALFTavares/nvim) submodule. |
 | `pupgui` | ProtonUp-Qt settings |
 
-### 3. System configs in `/etc`
+### 3. System configs in `/etc` and `/var/lib`
 
 | File | Setting | Why | Installed when |
 | --- | --- | --- | --- |
 | `/etc/NetworkManager/conf.d/wifi_backend.conf` | `wifi.backend=iwd` | Use iwd instead of wpa_supplicant for WiFi | Always (linked) |
 | `/etc/iwd/main.conf` | `[DriverQuirks]`<br>`PowerSaveDisable=mt7921e` | Keep WiFi power saving off, since it can cause dropouts and lag | MT7902 card present (linked) |
 | `/etc/modprobe.d/mt7921e.conf` | `options mt7921e disable_aspm=1` | Turn off PCIe power saving (ASPM) on the WiFi card. The BIOS has no setting for this. | MT7902 card present (copied) |
+| `/var/lib/plasmalogin/.config/kcminputrc` | `[Keyboard]`<br>`NumLock=0` | Turn NumLock on at the login screen. Your own `kcminputrc` (in the `kde` package) turns it on once you're logged in. | `plasmalogin` user exists (copied, owned by `plasmalogin`) |
 
 The MT7902 is the MediaTek WiFi card in the desktop (PCI ID `14c3:7902`, `mt7921e` driver). On other hardware these two files are skipped. Any existing file is renamed to `<file>.bak-<date>` before being replaced.
 
@@ -125,7 +126,10 @@ Expect to adjust some machine-specific KDE settings, such as screen layout and p
 
 Files in your home folder are links into this repo, so editing a config edits the repo. Commit and push to keep other machines in sync.
 
-Files in `system/etc/modprobe.d/` are copies, not links, because they're read before `/home` is mounted. After editing one, run `./install.sh --skip-packages` (or copy the file to `/etc/modprobe.d/` with `sudo cp`) and reboot.
+Some files in `system/` are copies, not links, so they need installing again after you edit them: run `./install.sh --skip-packages` and reboot.
+
+- `system/etc/modprobe.d/`: read before `/home` is mounted.
+- `system/var/lib/plasmalogin/`: the login screen runs as the `plasmalogin` user, which can't read files in your home folder. The copies are owned by `plasmalogin`.
 
 To refresh the package lists:
 

@@ -1,3 +1,6 @@
+[Keyboard]
+NumLock=0
+
 [Libinput][1133][16511][Logitech G502]
 NaturalScroll=false
 ScrollFactor=1
